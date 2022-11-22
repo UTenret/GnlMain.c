@@ -6,7 +6,7 @@
 /*   By: utenret <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/16 17:44:03 by utenret           #+#    #+#             */
-/*   Updated: 2022/11/22 12:31:43 by utenret          ###   ########.fr       */
+/*   Updated: 2022/11/22 16:01:53 by utenret          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <limits.h>
+
+#ifndef FD
+# define FD 1
+#endif
 
 char    **ft_split(char const *str, char c);
 void    ft_cleanup(char **split);
@@ -57,8 +61,9 @@ char	*ft_strjoin(char *s1, char *s2)
 		if (s2 != NULL)
 			ft_strlcpy(s + len1, s2, len2 + 1);
 	}
-//	printf("doyougetherethough\n");
-//	free(s1);
+//	dprintf(FD, "doyougetherethough\n");
+	if (s1 != NULL)
+		free(s1);
 	return (s);
 }
 
@@ -70,7 +75,7 @@ char	*ft_strnjoin(char *s1, char *s2, int size)
 
 	len1 = 0;
 	len2 = 0;
-	printf("size =========%d\n", size);
+	dprintf(FD, "size =========%d\n", size);
 	if (s1 != NULL)
 		len1 = ft_strlen(s1);
 	if (s2 != NULL)
@@ -83,8 +88,9 @@ char	*ft_strnjoin(char *s1, char *s2, int size)
 		if (s2 != NULL)
 			ft_strlcpy(s + len1, s2, size + 1);
 	}
-//	printf("doyougetherethough\n");
-//	free(s1);
+//	dprintf(FD, "doyougetherethough\n");
+	if (s1 != NULL)
+		free(s1);
 	return (s);
 }
 
@@ -103,8 +109,8 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	size_t	i;
 
 	i = 0;
-	printf("intresting dst -> %c\n", dst[i]);
-	printf("intresting src -> %c\n", src[i]);
+	dprintf(FD, "intresting dst -> %c\n", dst[i]);
+	dprintf(FD, "intresting src -> %c\n", src[i]);
 	while (size > 1 && src[i] != '\0')
 	{
 		dst[i] = src[i];
@@ -137,7 +143,7 @@ char	*ft_gnl(char *gnl, char *res)
 	int		l;	 
 
 	l = ft_does_str_contains_n(gnl);
-	printf("l ====== %d\n", l);
+	dprintf(FD, "l ====== %d\n", l);
 	res = malloc(sizeof(char) * l + 1);
 	if (!res)
 		return (NULL);
@@ -154,7 +160,8 @@ int	ft_does_str_contains_n(char	*str)
 	i = 0;
 	if (str[i] == '\n')
 		return (i + 1);
-	while(str[i] && str)
+	dprintf(FD, "str ========%s\n", str);
+	while(str[i])
 	{
 		i++;
 		if (str[i] == '\n')
@@ -189,63 +196,73 @@ char	*get_next_line(int fd)
 	int	i;
 
 	ft_memset(buf, 0, BUFFER_SIZE + 1);
+	dprintf(FD, "GNL1 ===== %s\n", gnl);
 	i = ft_does_str_contains_n(gnl);
-	printf("THE I ====%d\n", i);
+	dprintf(FD, "THE I ====%d\n", i);
 	res = NULL;
-//	printf("i ========%d\n", i);
+//	dprintf(FD, "i ========%d\n", i);
 	if (i >= 0)
 	{
-		printf("here\n");
-		printf("strlen de gnl beginning -> %zu\n", ft_strlen(gnl));
+		dprintf(FD, "here\n");
+		dprintf(FD, "strlen de gnl beginning -> %zu\n", ft_strlen(gnl));
+		c = ft_strlen(gnl);
+		dprintf(FD, "c =====%d\n", c);
 		if (i < ft_strlen(gnl))	
 		{
-			printf("haaaaaar\n");
+			dprintf(FD, "haaaaaar\n");
 			res = ft_strnjoin(res, gnl, i);
-			ft_strlcpy(gnl, gnl + i, BUFFER_SIZE + 2);	
-			ft_memset(gnl + ft_strlen(gnl), 0, BUFFER_SIZE + 1 - ft_strlen(gnl));
+			ft_strlcpy(gnl, gnl + i, BUFFER_SIZE + 1);	
+			dprintf(FD, "c2 =====%d\n", c);
+//			dprintf(FD, "strlen de gnl after -> %zu\n", ft_strlen(gnl));
+			ft_memset(gnl + /*ft_strlen(gnl)*/c, 0, BUFFER_SIZE + 1 - c);//ft_strlen(gnl));
 	//		res = ft_strjoin(res, buf);
 //			ft_strlcpy(res, gnl, i);	
 //			ft_strlcpy(gnl, gnl + i, BUFFER_SIZE);	
 	//		ft_memset(gnl, 0, i + ft_where_nozero(gnl));
-			printf("haaaaahgjghjghjhgar\n");
+			dprintf(FD, "strlen de gnl after memest -> %zu\n", ft_strlen(gnl));
+			dprintf(FD, "GNL ===== %s\n", gnl);
+			dprintf(FD, "haaaaahgjghjghjhgar\n");
 			return (res);	
 		}
 		else
 		{ 
 			res = ft_strjoin(res, gnl);
 			ft_memset(gnl, 0, BUFFER_SIZE);
-			printf("cock\n");
+			dprintf(FD, "cock\n");
 			return (res);
 		}
-	//	printf("catchme bitch\n");
+	//	dprintf(FD, "catchme bitch\n");
 	//	return (ft_gnl(gnl, res));		
 	}
-	//	printf("here2\n");
+	//	dprintf(FD, "here2\n");
 //	if (ft_does_str_contains_n(buf) == -1)
 //		c = read(fd, buf, BUFFER_SIZE);
 	else
 	{
-		printf("here20\n");
+		dprintf(FD, "here20\n");
 		i = ft_does_str_contains_n(buf);	
-		printf("THE I2 ====%d\n", i);
-		res = malloc(1);
+		dprintf(FD, "THE I2 ====%d\n", i);
+		res = NULL;
 		res = ft_strjoin(res, gnl);	
+		dprintf(FD, "GNL4 ===== %s\n", gnl);
 		ft_memset(gnl, 0, BUFFER_SIZE);
+		dprintf(FD, "GNL5 ===== %s\n", gnl);
 		while (i == -1)
 		{
 			c = read(fd, buf, BUFFER_SIZE);
+			dprintf(FD, "buf99 ====== %s\n", buf);
 			i = ft_does_str_contains_n(buf); // need to fix that
-			printf("here3\n");
-			printf("i ========%d\n", i);
-	//		printf("i ==%d\n", i);
-	//		printf("strlen buf =====%zu\n", ft_strlen(buf));
-	//		printf("buf2 ==========%s-\n", buf);
-	//		printf("result =====%i\n", ft_does_str_contains_n(buf));
+			dprintf(FD, "here3\n");
+			dprintf(FD, "i ========%d\n", i);
+	//		dprintf(FD, "i ==%d\n", i);
+	//		dprintf(FD, "strlen buf =====%zu\n", ft_strlen(buf));
+	//		dprintf(FD, "buf2 ==========%s-\n", buf);
+	//		dprintf(FD, "result =====%i\n", ft_does_str_contains_n(buf));
 			if (c == 0)
 				return (NULL);
 			if (i == -1)
 			{
-				printf("here30\n");
+				dprintf(FD, "here30\n");
 				res = ft_strjoin(res, buf);	
 				ft_memset(buf, 0, BUFFER_SIZE);
 			}
@@ -256,23 +273,23 @@ char	*get_next_line(int fd)
 			return (res);
 		else
 		{
-			printf("here5\n");
-	//		printf("buf ==========%s-\n", buf);
-			ft_strlcpy(gnl, buf + i, c - i);	
-//			printf("GNL ==========%s-\n", gnl);
+			dprintf(FD, "here5\n");
+	//		dprintf(FD, "buf ==========%s-\n", buf);
+			ft_strlcpy(gnl, buf + i, c + 1 - i);	
+//			dprintf(FD, "GNL ==========%s-\n", gnl);
 			ft_memset(buf + i, 0, c - i);
 			res = ft_strjoin(res, buf);
 			ft_memset(buf, 0, BUFFER_SIZE);
 //			ft_strlcpy(gnl, gnl + i, ft_strlen(gnl));
 	//		buf[ft_does_str_contains_n(buf)] = '\0';
-//			printf("here6\n");
-		//	printf("here7\n");
+//			dprintf(FD, "here6\n");
+		//	dprintf(FD, "here7\n");
 			return(res);	
-	//		printf("here8\n");
+	//		dprintf(FD, "here8\n");
 		}
-//	printf("tauluwq ========%d\n", i);
+//	dprintf(FD, "tauluwq ========%d\n", i);
 	}
-//	printf("i ========%d\n", i);
+//	dprintf(FD, "i ========%d\n", i);
 	return (NULL);
 }
 
@@ -294,8 +311,8 @@ int	main(int ac, char **av)
 		while (res != NULL || fb == 0)
 		{
 			res = get_next_line(a);
-			printf("\nLigne%d ===== %s\n!=====!\n", i, res);
-		//	printf("[%s]\n", res);
+			dprintf(FD, "\n!=====!\n\n");
+			printf("Ligne%3d ===== %s", i, res);
 			if (res)
 				free (res);
 			i++;
@@ -304,3 +321,5 @@ int	main(int ac, char **av)
 	}
 	return (EXIT_SUCCESS);	
 }
+
+// gcc -D BUFFER_SIZE=150 -D FD=-1 get_next_line.c && ./a.out file.txt | cat -e
